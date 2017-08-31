@@ -56,11 +56,19 @@ class AirCargoProblem(Problem):
 
         def load_actions():
             """Create all concrete Load actions and return a list
-
             :return: list of Action objects
             """
             loads = []
             # TODO create all load ground actions from the domain Load action
+            for c, p, a in [(cargo, plane, airport) for cargo in self.cargos for plane in self.planes for airport in
+                            self.airports]:
+                precond_pos = [expr("At({},{})".format(c, a)), expr("At({},{})".format(p, a))]
+                precond_neg = []
+                effect_add = [expr("In({},{})".format(c, p))]
+                effect_rem = [expr("At({},{})".format(c, a))]
+                load = Action(expr("Load({}, {}, {})".format(c, p, a)), [precond_pos, precond_neg],
+                              [effect_add, effect_rem])
+                loads.append(load)
             return loads
 
         def unload_actions():
@@ -70,6 +78,15 @@ class AirCargoProblem(Problem):
             """
             unloads = []
             # TODO create all Unload ground actions from the domain Unload action
+            for c, p, a in [(cargo, plane, airport) for cargo in self.cargos for plane in self.planes for airport in
+                            self.airports]:
+                precond_pos = [expr("At({},{})".format(c, p)), expr("At({},{})".format(p, a))]
+                precond_neg = []
+                effect_add = [expr("In({},{})".format(c, a))]
+                effect_rem = [expr("At({},{})".format(c, p))]
+                upload = Action(expr("Load({}, {}, {})".format(c, p, a)), [precond_pos, precond_neg],
+                                [effect_add, effect_rem])
+                unloads.append(upload)
             return unloads
 
         def fly_actions():
@@ -105,6 +122,23 @@ class AirCargoProblem(Problem):
         """
         # TODO implement
         possible_actions = []
+        decoded_state = decode_state(state=state, fluent_map=self.state_map)
+        state_pos = decoded_state.pos
+        state_neg = decoded_state.neg
+        for action in self.actions_list:
+            is_valid = True
+            for positive_precondition in action.precond_pos:
+                if positive_precondition not in state_pos:
+                    is_valid = False
+                    break
+
+            for negative_prediction in action.precond_neg:
+                is_valid = False
+                break
+
+            if is_valid:
+                possible_actions.append(action)
+
         return possible_actions
 
     def result(self, state: str, action: Action):
@@ -117,7 +151,16 @@ class AirCargoProblem(Problem):
         :return: resulting state after action
         """
         # TODO implement
-        new_state = FluentState([], [])
+        decoded_state = decode_state(state, self.state_map)
+        state_pos = decoded_state.pos
+        state_neg = decoded_state.neg
+        for add in action.effect_add:
+            state_pos.append(add)
+            state_neg.remove(add)
+        for rem in action.effect_rem:
+            state_pos.remove(rem)
+            state_neg.append(rem)
+        new_state = FluentState(state_pos, state_neg)
         return encode_state(new_state, self.state_map)
 
     def goal_test(self, state: str) -> bool:
