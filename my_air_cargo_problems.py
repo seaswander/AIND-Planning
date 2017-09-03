@@ -15,7 +15,6 @@ from functools import lru_cache
 class AirCargoProblem(Problem):
     def __init__(self, cargos, planes, airports, initial: FluentState, goal: list):
         """
-
         :param cargos: list of str
             cargos in the problem
         :param planes: list of str
@@ -99,8 +98,7 @@ class AirCargoProblem(Problem):
                 for to in self.airports:
                     if fr != to:
                         for p in self.planes:
-                            precond_pos = [expr("At({}, {})".format(p, fr)),
-                                           ]
+                            precond_pos = [expr("At({}, {})".format(p, fr)),]
                             precond_neg = []
                             effect_add = [expr("At({}, {})".format(p, to))]
                             effect_rem = [expr("At({}, {})".format(p, fr))]
@@ -113,6 +111,7 @@ class AirCargoProblem(Problem):
         return load_actions() + unload_actions() + fly_actions()
 
     def actions(self, state: str) -> list:
+
         """ Return the actions that can be executed in the given state.
 
         :param state: str
@@ -176,8 +175,7 @@ class AirCargoProblem(Problem):
                 return False
         return True
 
-    def h_1(self, node: Node):
-        # note that this is not a true heuristic
+    def h_1(self, node: Node):  # note that this is not a true heuristic
         h_const = 1
         return h_const
 
@@ -201,8 +199,8 @@ class AirCargoProblem(Problem):
         executed.
         """
         # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
-        print('node.state:',node.state)
-        count = node.state.count('T')/2
+        print('node.state:', node.state)
+        count = node.state.count('T') / 2
         return count
 
 
@@ -231,8 +229,7 @@ def air_cargo_p1() -> AirCargoProblem:
     return AirCargoProblem(cargos, planes, airports, init, goal)
 
 
-def air_cargo_p2() -> AirCargoProblem:
-    # TODO implement Problem 2 definition
+def air_cargo_p2() -> AirCargoProblem:  # TODO implement Problem 2 definition
     cargos = ['C1', 'C2', 'C3']
     planes = ['P1', 'P2', 'P3']
     airports = ['JFK', 'SFO', 'ATL']
@@ -273,8 +270,7 @@ def air_cargo_p2() -> AirCargoProblem:
     return AirCargoProblem(cargos, planes, airports, init, goal)
 
 
-def air_cargo_p3() -> AirCargoProblem:
-    # TODO implement Problem 3 definition
+def air_cargo_p3() -> AirCargoProblem:  # TODO implement Problem 3 definition
     cargos = ['C1', 'C2', 'C3', 'C4']
     planes = ['P1', 'P2']
     airports = ['JFK', 'SFO', 'ATL', 'ORD']
